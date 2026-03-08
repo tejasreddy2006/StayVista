@@ -3,15 +3,23 @@ const Listing = require('../models/listing');
 const Booking = require('../models/booking');
 
 module.exports.dashboard = async (req, res) => {
-    const users = await User.countDocuments();
+    const usersCount = await User.countDocuments();
     const listings = await Listing.countDocuments();
     const bookings = await Booking.find({}).populate('user listing').sort({ createdAt: -1 });
     const recentListings = await Listing.find({}).populate('owner').sort({ createdAt: -1 }).limit(5);
-    
-    res.render('admin/dashboard', { 
-        stats: { users, listings },
+
+    // Fetch users with their booking totals
+    const usersList = await User.find({}).sort({ createdAt: -1 }).lean();
+    const usersWithBookings = await Promise.all(usersList.map(async (user) => {
+        const totalBookings = await Booking.countDocuments({ user: user._id });
+        return { ...user, totalBookings };
+    }));
+
+    res.render('admin/dashboard', {
+        stats: { users: usersCount, listings },
         bookings,
-        recentListings
+        recentListings,
+        users: usersWithBookings
     });
 };
 
@@ -28,6 +36,13 @@ module.exports.deleteListing = async (req, res) => {
 };
 
 module.exports.manageUsers = async (req, res) => {
-    const users = await User.find({}).sort({ createdAt: -1 });
-    res.render('admin/users', { users });
+    const users = await User.find({}).sort({ createdAt: -1 }).lean();
+
+    // Fetch total bookings for each user
+    const usersWithBookings = await Promise.all(users.map(async (user) => {
+        const totalBookings = await Booking.countDocuments({ user: user._id });
+        return { ...user, totalBookings };
+    }));
+
+    res.render('admin/users', { users: usersWithBookings });
 };

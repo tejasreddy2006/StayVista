@@ -1,108 +1,179 @@
 <%- layout('layouts/boilerplate') %>
 
-<div class="container">
-    <h2 class="mb-4">Admin Dashboard</h2>
-    
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center bg-primary text-white">
-                <div class="card-body">
-                    <i class="bi bi-people fs-1"></i>
-                    <h5 class="card-title mt-2">Total Users</h5>
-                    <p class="card-text fs-3 fw-bold"><%= stats.users %></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-success text-white">
-                <div class="card-body">
-                    <i class="bi bi-house-door fs-1"></i>
-                    <h5 class="card-title mt-2">Total Listings</h5>
-                    <p class="card-text fs-3 fw-bold"><%= stats.listings %></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-warning text-white">
-                <div class="card-body">
-                    <i class="bi bi-calendar-check fs-1"></i>
-                    <h5 class="card-title mt-2">Total Bookings</h5>
-                    <p class="card-text fs-3 fw-bold"><%= bookings.length %></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-info text-white">
-                <div class="card-body">
-                    <i class="bi bi-star fs-1"></i>
-                    <h5 class="card-title mt-2">Revenue</h5>
-                    <p class="card-text fs-3 fw-bold">$<%= bookings.reduce((sum, booking) => sum + booking.totalPrice, 0).toFixed(2) %></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="container">
+        <h2 class="mb-4">Admin Dashboard</h2>
 
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Recent Bookings</h4>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Property</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% bookings.slice(0, 5).forEach(booking => { %>
-                            <tr>
-                                <td><%= booking.user.username %></td>
-                                <td><%= booking.listing.title %></td>
-                                <td>$<%= booking.totalPrice %></td>
-                                <td><%= new Date(booking.createdAt).toLocaleDateString() %></td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center bg-primary text-white">
+                    <div class="card-body">
+                        <i class="bi bi-people fs-1"></i>
+                        <h5 class="card-title mt-2">Total Users</h5>
+                        <p class="card-text fs-3 fw-bold">
+                            <%= stats.users %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center bg-success text-white">
+                    <div class="card-body">
+                        <i class="bi bi-house-door fs-1"></i>
+                        <h5 class="card-title mt-2">Total Listings</h5>
+                        <p class="card-text fs-3 fw-bold">
+                            <%= stats.listings %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center bg-warning text-white">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-check fs-1"></i>
+                        <h5 class="card-title mt-2">Total Bookings</h5>
+                        <p class="card-text fs-3 fw-bold">
+                            <%= bookings.length %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center bg-info text-white">
+                    <div class="card-body">
+                        <i class="bi bi-star fs-1"></i>
+                        <h5 class="card-title mt-2">Revenue</h5>
+                        <p class="card-text fs-3 fw-bold">$<%= bookings.reduce((sum, booking)=> sum +
+                                booking.totalPrice, 0).toFixed(2) %></p>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <h4>Recent Listings</h4>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Owner</th>
-                            <th>Price</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% recentListings.forEach(listing => { %>
-                            <tr>
-                                <td><%= listing.title %></td>
-                                <td><%= listing.owner.username %></td>
-                                <td>$<%= listing.price %></td>
-                                <td>
-                                    <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-primary">View</a>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="/admin/listings" class="btn btn-outline-primary">Manage Listings</a>
-                <a href="/admin/users" class="btn btn-outline-secondary">Manage Users</a>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>All Bookings</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User Name</th>
+                                <th>User Email</th>
+                                <th>Listing Name</th>
+                                <th>Check-in Date</th>
+                                <th>Check-out Date</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bookings.forEach(booking=> { %>
+                                <tr>
+                                    <td>
+                                        <%= booking.user.username %>
+                                    </td>
+                                    <td>
+                                        <%= booking.user.email %>
+                                    </td>
+                                    <td>
+                                        <%= booking.listing ? booking.listing.title : 'Deleted' %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(booking.checkInDate).toLocaleDateString() %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(booking.checkOutDate).toLocaleDateString() %>
+                                    </td>
+                                    <td>$<%= booking.totalPrice %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4>Recent Listings</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Owner</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% recentListings.forEach(listing=> { %>
+                                <tr>
+                                    <td>
+                                        <%= listing.title %>
+                                    </td>
+                                    <td>
+                                        <%= listing.owner.username %>
+                                    </td>
+                                    <td>$<%= listing.price %>
+                                    </td>
+                                    <td>
+                                        <a href="/listings/<%= listing._id %>"
+                                            class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h4>All Users</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Total Bookings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(typeof users !=='undefined' ) { %>
+                                <% users.forEach(user=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= user.username %>
+                                        </td>
+                                        <td>
+                                            <%= user.email %>
+                                        </td>
+                                        <td>
+                                            <%= user.role %>
+                                        </td>
+                                        <td>
+                                            <%= user.totalBookings || 0 %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="4" class="text-center">Refresh to see users or implement
+                                                    users pass-in if empty</td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="/admin/listings" class="btn btn-outline-primary">Manage Listings</a>
+                    <a href="/admin/users" class="btn btn-outline-secondary">Manage Users</a>
+                </div>
             </div>
         </div>
     </div>
-</div>

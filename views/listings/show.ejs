@@ -1,105 +1,120 @@
 <%- layout('layouts/boilerplate') %>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <img src="<%= listing.image %>" class="img-fluid rounded mb-4" alt="<%= listing.title %>">
-            <h2 class="mb-3"><%= listing.title %></h2>
-            <p class="text-muted mb-3">
-                <i class="bi bi-geo-alt"></i> <%= listing.location %>, <%= listing.country %>
-            </p>
-            <p><%= listing.description %></p>
-            
-            <% if(listing.reviews && listing.reviews.length > 0) { %>
-                <h4 class="mt-5 mb-3">Reviews</h4>
-                <div class="row">
-                    <% for(let review of listing.reviews) { %>
-                        <div class="col-md-12 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="card-title"><%= review.user.username %></h6>
-                                        <div>
-                                            <% for(let i = 1; i <= 5; i++) { %>
-                                                <% if(i <= review.rating) { %>
-                                                    <i class="bi bi-star-fill text-warning"></i>
-                                                <% } else { %>
-                                                    <i class="bi bi-star text-warning"></i>
-                                                <% } %>
-                                            <% } %>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <img src="<%= listing.image %>" class="img-fluid rounded mb-4" alt="<%= listing.title %>">
+                <h2 class="mb-3">
+                    <%= listing.title %>
+                </h2>
+                <p class="text-muted mb-3">
+                    <i class="bi bi-geo-alt"></i>
+                    <%= listing.location %>, <%= listing.country %>
+                </p>
+                <p>
+                    <%= listing.description %>
+                </p>
+
+                <% if(listing.reviews && listing.reviews.length> 0) { %>
+                    <h4 class="mt-5 mb-3">Reviews</h4>
+                    <div class="row">
+                        <% for(let review of listing.reviews) { %>
+                            <div class="col-md-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="card-title">
+                                                <%= review.user.username %>
+                                            </h6>
+                                            <div>
+                                                <% for(let i=1; i <=5; i++) { %>
+                                                    <% if(i <=review.rating) { %>
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                        <% } else { %>
+                                                            <i class="bi bi-star text-warning"></i>
+                                                            <% } %>
+                                                                <% } %>
+                                            </div>
                                         </div>
+                                        <p class="card-text">
+                                            <%= review.comment %>
+                                        </p>
+                                        <small class="text-muted">
+                                            <%= new Date(review.createdAt).toLocaleDateString() %>
+                                        </small>
                                     </div>
-                                    <p class="card-text"><%= review.comment %></p>
-                                    <small class="text-muted">
-                                        <%= new Date(review.createdAt).toLocaleDateString() %>
-                                    </small>
                                 </div>
                             </div>
-                        </div>
+                            <% } %>
+                    </div>
                     <% } %>
-                </div>
-            <% } %>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">$<%= listing.price %><small class="text-muted">/night</small></h3>
-                    <p class="text-muted mb-3">Hosted by <%= listing.owner ? listing.owner.username : 'Unknown Host' %></p>
-                    
-                    <% if(currentUser) { %>
-                        <form action="/bookings/listings/<%= listing._id %>" method="POST" class="mb-3">
-                            <div class="mb-3">
-                                <label for="checkInDate" class="form-label">Check-in</label>
-                                <input type="date" class="form-control" id="checkInDate" name="checkInDate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="checkOutDate" class="form-label">Check-out</label>
-                                <input type="date" class="form-control" id="checkOutDate" name="checkOutDate" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Reserve Now</button>
-                        </form>
-                    <% } else { %>
-                        <a href="/login" class="btn btn-primary w-100">Login to Book</a>
-                    <% } %>
-                    
-                    <% if(currentUser && (listing.owner && listing.owner.equals(currentUser._id) || currentUser.role === 'admin')) { %>
-                        <hr>
-                        <div class="d-grid gap-2">
-                            <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">Edit Listing</a>
-                            <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
-                                <button class="btn btn-outline-danger w-100">Delete Listing</button>
-                            </form>
-                        </div>
-                    <% } %>
-                </div>
             </div>
-            
-            <% if(currentUser) { %>
-                <div class="card mt-3">
+
+            <div class="col-md-4">
+                <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Leave a Review</h5>
-                        <form action="/reviews/listings/<%= listing._id %>" method="POST">
-                            <div class="mb-3">
-                                <label for="rating" class="form-label">Rating</label>
-                                <select class="form-select" id="rating" name="review[rating]" required>
-                                    <option value="">Select rating</option>
-                                    <option value="5">5 Stars</option>
-                                    <option value="4">4 Stars</option>
-                                    <option value="3">3 Stars</option>
-                                    <option value="2">2 Stars</option>
-                                    <option value="1">1 Star</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="comment" class="form-label">Comment</label>
-                                <textarea class="form-control" id="comment" name="review[comment]" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Submit Review</button>
-                        </form>
+                        <h3 class="card-title">$<%= listing.price %><small class="text-muted">/night</small></h3>
+                        <p class="text-muted mb-3">Hosted by <%= listing.owner ? listing.owner.username : 'Unknown Host'
+                                %>
+                        </p>
+
+                        <% if(currentUser) { %>
+                            <form action="/bookings/listings/<%= listing._id %>" method="POST" class="mb-3">
+                                <div class="mb-3">
+                                    <label for="checkInDate" class="form-label">Check-in</label>
+                                    <input type="date" class="form-control" id="checkInDate" name="checkInDate"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="checkOutDate" class="form-label">Check-out</label>
+                                    <input type="date" class="form-control" id="checkOutDate" name="checkOutDate"
+                                        required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Reserve Now</button>
+                            </form>
+                            <% } else { %>
+                                <a href="/login" class="btn btn-primary w-100">Login to Book</a>
+                                <% } %>
+
+                                    <% if(currentUser && currentUser.role==='admin' ) { %>
+                                        <hr>
+                                        <div class="d-grid gap-2">
+                                            <a href="/listings/<%= listing._id %>/edit"
+                                                class="btn btn-outline-primary">Edit Listing</a>
+                                            <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
+                                                <button class="btn btn-outline-danger w-100">Delete Listing</button>
+                                            </form>
+                                        </div>
+                                        <% } %>
                     </div>
                 </div>
-            <% } %>
+
+                <% if(currentUser) { %>
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Leave a Review</h5>
+                            <form action="/reviews/listings/<%= listing._id %>" method="POST">
+                                <div class="mb-3">
+                                    <label for="rating" class="form-label">Rating</label>
+                                    <select class="form-select" id="rating" name="review[rating]" required>
+                                        <option value="">Select rating</option>
+                                        <option value="5">5 Stars</option>
+                                        <option value="4">4 Stars</option>
+                                        <option value="3">3 Stars</option>
+                                        <option value="2">2 Stars</option>
+                                        <option value="1">1 Star</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Comment</label>
+                                    <textarea class="form-control" id="comment" name="review[comment]" rows="3"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
         </div>
     </div>
-</div>
