@@ -1,0 +1,79 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="mb-4">Edit Listing</h2>
+                    <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="listing[title]" value="<%= listing.title %>" required>
+                            <div class="invalid-feedback">
+                                Please provide a title.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="listing[description]" rows="4" required><%= listing.description %></textarea>
+                            <div class="invalid-feedback">
+                                Please provide a description.
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price per night</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="price" name="listing[price]" value="<%= listing.price %>" min="0" step="0.01" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid price.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="image" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="image" name="listing[image]" value="<%= listing.image %>" placeholder="https://example.com/image.jpg">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="listing[location]" value="<%= listing.location %>" required>
+                            <div class="invalid-feedback">
+                                Please provide a location.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" name="listing[country]" value="<%= listing.country %>" required>
+                            <div class="invalid-feedback">
+                                Please provide a country.
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/listings/<%= listing._id %>" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Listing</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>

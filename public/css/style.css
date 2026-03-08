@@ -1,0 +1,109 @@
+/* Custom styles for Wanderlust */
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.listing-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 100px 0;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.feature-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+}
+
+.btn-primary {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.btn-primary:hover {
+    background-color: #5a6fd8;
+    border-color: #5a6fd8;
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: white;
+}
+
+footer {
+    margin-top: auto;
+}
+
+.rating-stars {
+    color: #ffc107;
+}
+
+.booking-form {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.admin-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dashboard-stat {
+    transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-stat:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+}

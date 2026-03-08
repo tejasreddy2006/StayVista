@@ -1,0 +1,47 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Users</h2>
+        <a href="/admin/dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.username %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <span class="badge <%= user.role === 'admin' ? 'bg-danger' : 'bg-primary' %>">
+                                <%= user.role %>
+                            </span>
+                        </td>
+                        <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" disabled>View Details</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+    
+    <% if(users.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="bi bi-people text-muted fs-1"></i>
+            <h3 class="mt-3">No users found</h3>
+            <p class="text-muted">There are no users in the system yet.</p>
+        </div>
+    <% } %>
+</div>

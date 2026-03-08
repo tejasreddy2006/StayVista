@@ -1,0 +1,21 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+            <h2 class="mt-4">Oops! Something went wrong</h2>
+            <% if(typeof err !== 'undefined' && err) { %>
+                <p class="text-muted"><%= err.message %></p>
+            <% } else if(typeof error !== 'undefined' && error) { %>
+                <p class="text-muted"><%= error %></p>
+            <% } else { %>
+                <p class="text-muted">An unexpected error occurred</p>
+            <% } %>
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">Go Home</a>
+                <a href="/listings" class="btn btn-outline-primary">Browse Listings</a>
+            </div>
+        </div>
+    </div>
+</div>
