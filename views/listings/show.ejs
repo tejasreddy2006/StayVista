@@ -9,7 +9,10 @@
                 </h2>
                 <p class="text-muted mb-3">
                     <i class="bi bi-geo-alt"></i>
-                    <%= listing.location %>, <%= listing.country %>
+                    <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(listing.location + ', ' + listing.country) %>"
+                        target="_blank" class="text-decoration-none text-muted">
+                        <%= listing.location %>, <%= listing.country %>
+                    </a>
                 </p>
                 <p>
                     <%= listing.description %>
@@ -53,7 +56,8 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="card-title">$<%= listing.price %><small class="text-muted">/night</small></h3>
+                        <h3 class="card-title">₹<%= listing.price.toLocaleString("en-IN") %><small
+                                    class="text-muted">/night</small></h3>
                         <p class="text-muted mb-3">Hosted by <%= listing.owner ? listing.owner.username : 'Unknown Host'
                                 %>
                         </p>

@@ -2,8 +2,25 @@ const Listing = require('../models/listing');
 const Review = require('../models/review');
 
 module.exports.index = async (req, res) => {
-    const listings = await Listing.find({}).populate('owner');
-    res.render('listings/index', { listings });
+    const searchQuery = req.query.search;
+    let listings;
+
+    if (searchQuery) {
+        // Remove special regex characters for safety (Sanitization)
+        const safeQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        listings = await Listing.find({
+            $or: [
+                { title: { $regex: safeQuery, $options: "i" } },
+                { location: { $regex: safeQuery, $options: "i" } },
+                { country: { $regex: safeQuery, $options: "i" } }
+            ]
+        }).populate('owner');
+    } else {
+        listings = await Listing.find({}).populate('owner');
+    }
+
+    res.render('listings/index', { listings, searchQuery });
 };
 
 module.exports.renderNewForm = (req, res) => {

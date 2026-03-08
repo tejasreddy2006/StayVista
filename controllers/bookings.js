@@ -15,6 +15,12 @@ module.exports.createBooking = async (req, res) => {
     const { checkInDate, checkOutDate } = req.body;
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
+
+    if (checkOut <= checkIn) {
+        req.flash('error', 'Check-out date must be after check-in date.');
+        return res.redirect(`/listings/${id}`);
+    }
+
     const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
     const totalPrice = nights * listing.price;
 
@@ -56,4 +62,26 @@ module.exports.deleteBooking = async (req, res) => {
     req.flash('success', 'Successfully cancelled the booking!');
     const redirectTo = req.headers.referer || '/dashboard';
     res.redirect(redirectTo);
+};
+
+module.exports.payBooking = async (req, res) => {
+    const { id } = req.params;
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+        req.flash('error', 'Booking not found!');
+        return res.redirect('/dashboard');
+    }
+
+    if (!booking.user.equals(req.user._id)) {
+        req.flash('error', 'You do not have permission to pay for this booking.');
+        return res.redirect('/dashboard');
+    }
+
+    await Booking.findByIdAndUpdate(id, {
+        paymentStatus: "paid"
+    });
+
+    req.flash('success', 'Payment completed successfully');
+    res.redirect('/dashboard');
 };

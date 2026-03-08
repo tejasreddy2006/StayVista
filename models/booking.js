@@ -23,12 +23,17 @@ const bookingSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0
+    },
+    paymentStatus: {
+        type: String,
+        enum: ["pending", "paid"],
+        default: "pending"
     }
 }, {
     timestamps: true
 });
 
-bookingSchema.pre('save', function(next) {
+bookingSchema.pre('save', function (next) {
     if (this.checkOutDate <= this.checkInDate) {
         next(new Error('Check-out date must be after check-in date'));
     } else {

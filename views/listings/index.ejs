@@ -26,14 +26,17 @@
                             </h5>
                             <p class="card-text text-muted small">
                                 <i class="bi bi-geo-alt"></i>
-                                <%= listing.location %>, <%= listing.country %>
+                                <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(listing.location + ', ' + listing.country) %>"
+                                    target="_blank" class="text-decoration-none text-muted">
+                                    <%= listing.location %>, <%= listing.country %>
+                                </a>
                             </p>
                             <p class="card-text">
                                 <%= listing.description.substring(0, 100) %>...
                             </p>
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="h5 text-primary">$<%= listing.price %></span>
+                                    <span class="h5 text-primary">₹<%= listing.price.toLocaleString("en-IN") %></span>
                                     <span class="text-muted">/night</span>
                                 </div>
                                 <a href="/listings/<%= listing._id %>" class="btn btn-outline-primary btn-sm mt-2">View
@@ -47,12 +50,19 @@
 
         <% if(listings.length===0) { %>
             <div class="text-center py-5">
-                <i class="bi bi-house text-muted fs-1"></i>
-                <h3 class="mt-3">No listings yet</h3>
-                <p class="text-muted">Be the first to add a listing!</p>
-                <% if(currentUser) { %>
-                    <a href="/listings/new" class="btn btn-primary">Create Listing</a>
-                    <% } %>
+                <% if(typeof searchQuery !=='undefined' && searchQuery !=='' ) { %>
+                    <i class="bi bi-search text-muted fs-1"></i>
+                    <h3 class="mt-3">No listings found for this search.</h3>
+                    <p class="text-muted">Try using a different city, location, or property name.</p>
+                    <a href="/listings" class="btn btn-outline-primary mt-2">Clear Search</a>
+                    <% } else { %>
+                        <i class="bi bi-house text-muted fs-1"></i>
+                        <h3 class="mt-3">No listings yet</h3>
+                        <p class="text-muted">Be the first to add a listing!</p>
+                        <% if(currentUser && currentUser.role==='admin' ) { %>
+                            <a href="/listings/new" class="btn btn-primary">Create Listing</a>
+                            <% } %>
+                                <% } %>
             </div>
             <% } %>
     </div>

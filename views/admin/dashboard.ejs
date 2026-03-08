@@ -42,8 +42,8 @@
                     <div class="card-body">
                         <i class="bi bi-star fs-1"></i>
                         <h5 class="card-title mt-2">Revenue</h5>
-                        <p class="card-text fs-3 fw-bold">$<%= bookings.reduce((sum, booking)=> sum +
-                                booking.totalPrice, 0).toFixed(2) %></p>
+                        <p class="card-text fs-3 fw-bold">₹<%= bookings.reduce((sum, booking)=> sum +
+                                booking.totalPrice, 0).toLocaleString("en-IN") %></p>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                                     <td>
                                         <%= new Date(booking.checkOutDate).toLocaleDateString() %>
                                     </td>
-                                    <td>$<%= booking.totalPrice %>
+                                    <td>₹<%= booking.totalPrice.toLocaleString("en-IN") %>
                                     </td>
                                 </tr>
                                 <% }) %>
@@ -109,9 +109,9 @@
                                         <%= listing.title %>
                                     </td>
                                     <td>
-                                        <%= listing.owner.username %>
+                                        <%= listing.owner ? listing.owner.username : 'Unknown' %>
                                     </td>
-                                    <td>$<%= listing.price %>
+                                    <td>₹<%= listing.price.toLocaleString("en-IN") %>
                                     </td>
                                     <td>
                                         <a href="/listings/<%= listing._id %>"

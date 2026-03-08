@@ -83,12 +83,19 @@ app.get('/dashboard', isLoggedIn, async (req, res) => {
     const listingsCount = await Listing.countDocuments({ owner: req.user._id });
     const bookingsCount = await Booking.countDocuments({ user: req.user._id });
     const reviewsCount = await Review.countDocuments({ user: req.user._id });
+
+    const result = await Booking.aggregate([
+        { $match: { user: req.user._id } },
+        { $group: { _id: null, totalSpent: { $sum: "$totalPrice" } } }
+    ]);
+    const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
+
     const recentBookings = await Booking.find({ user: req.user._id })
         .populate('listing')
         .sort({ createdAt: -1 })
         .limit(5);
 
-    res.render('dashboard/index', { listingsCount, bookingsCount, reviewsCount, recentBookings });
+    res.render('dashboard/index', { listingsCount, bookingsCount, reviewsCount, recentBookings, totalSpent });
 });
 
 app.all('*', (req, res, next) => {
