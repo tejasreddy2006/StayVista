@@ -1,4 +1,4 @@
-# Wanderlust - Airbnb Clone
+# StayVista
 
 A complete Airbnb-style web application built with Node.js, Express, MongoDB, and EJS.
 
