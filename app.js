@@ -21,7 +21,7 @@ const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviews');
 const adminRoutes = require('./routes/admin');
 
-mongoose.connect('mongodb://127.0.0.1:27017/wanderlust')
+mongoose.connect("mongodb+srv://prtejasreddy2006_db_user:N7a2IWKr8JtY2GA6@cluster0.ekdc7dm.mongodb.net/wanderlust?appName=Cluster0")
     .then(() => {
         console.log("MONGO CONNECTION OPEN!!!")
     })
