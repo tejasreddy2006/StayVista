@@ -24,124 +24,129 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
-/* ---------------- MongoDB Connection ---------------- */
+/* ---------------- DATABASE ---------------- */
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => {
+.then(()=>{
     console.log("MONGO CONNECTION OPEN!!!");
 })
-.catch(err => {
-    console.log("OH NO MONGO CONNECTION ERROR!!!!");
+.catch(err=>{
+    console.log("MONGO CONNECTION ERROR");
     console.log(err);
 });
 
-/* ---------------- App Config ---------------- */
+/* ---------------- APP CONFIG ---------------- */
 
 app.set("trust proxy", 1);
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname,'views'));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname,'public')));
 
-/* ---------------- Session Config ---------------- */
+/* ---------------- SESSION ---------------- */
 
 const sessionConfig = {
-    secret: process.env.SESSION_SECRET || "thisshouldbeabettersecret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7
+    name:"stayvista-session",
+    secret:process.env.SESSION_SECRET || "stayvista_secret",
+    resave:false,
+    saveUninitialized:false,
+    cookie:{
+        httpOnly:true,
+        secure:false,
+        expires:Date.now() + 1000*60*60*24*7,
+        maxAge:1000*60*60*24*7
     }
 };
 
 app.use(session(sessionConfig));
 app.use(flash());
 
-/* ---------------- Passport Config ---------------- */
+/* ---------------- PASSPORT ---------------- */
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy(User.authenticate()));
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-/* ---------------- Global Variables ---------------- */
+/* ---------------- GLOBAL VARIABLES ---------------- */
 
-app.use((req, res, next) => {
+app.use((req,res,next)=>{
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 });
 
-/* ---------------- Routes ---------------- */
+/* ---------------- ROUTES ---------------- */
 
-app.use('/', userRoutes);
-app.use('/listings', listingRoutes);
-app.use('/bookings', bookingRoutes);
-app.use('/reviews', reviewRoutes);
-app.use('/admin', adminRoutes);
+app.use('/',userRoutes);
+app.use('/listings',listingRoutes);
+app.use('/bookings',bookingRoutes);
+app.use('/reviews',reviewRoutes);
+app.use('/admin',adminRoutes);
 
-/* ---------------- Home Route ---------------- */
+/* ---------------- HOME ---------------- */
 
-app.get('/', (req, res) => {
+app.get('/',(req,res)=>{
     res.render('home');
 });
 
-/* ---------------- Dashboard ---------------- */
+/* ---------------- DASHBOARD ---------------- */
 
-app.get('/dashboard', isLoggedIn, async (req, res) => {
-    const listingsCount = await Listing.countDocuments({ owner: req.user._id });
-    const bookingsCount = await Booking.countDocuments({ user: req.user._id });
-    const reviewsCount = await Review.countDocuments({ user: req.user._id });
+app.get('/dashboard',isLoggedIn,async(req,res)=>{
+
+    const listingsCount = await Listing.countDocuments({owner:req.user._id});
+    const bookingsCount = await Booking.countDocuments({user:req.user._id});
+    const reviewsCount = await Review.countDocuments({user:req.user._id});
 
     const result = await Booking.aggregate([
-        { $match: { user: req.user._id } },
-        { $group: { _id: null, totalSpent: { $sum: "$totalPrice" } } }
+        { $match:{user:req.user._id}},
+        { $group:{ _id:null,totalSpent:{ $sum:"$totalPrice"}}}
     ]);
 
     const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
 
-    const recentBookings = await Booking.find({ user: req.user._id })
+    const recentBookings = await Booking.find({user:req.user._id})
         .populate('listing')
-        .sort({ createdAt: -1 })
+        .sort({createdAt:-1})
         .limit(5);
 
-    res.render('dashboard/index', {
+    res.render("dashboard/index",{
         listingsCount,
         bookingsCount,
         reviewsCount,
         recentBookings,
         totalSpent
     });
+
 });
 
-/* ---------------- 404 Handler ---------------- */
+/* ---------------- 404 ---------------- */
 
-app.all('*', (req, res) => {
-    res.status(404).render('error', { error: 'Page Not Found' });
+app.all("*",(req,res)=>{
+    res.status(404).render("error",{error:"Page Not Found"});
 });
 
-/* ---------------- Error Handler ---------------- */
+/* ---------------- ERROR HANDLER ---------------- */
 
-app.use((err, req, res, next) => {
-    const { statusCode = 500 } = err;
-    if (!err.message) err.message = "Oh No, Something Went Wrong!";
-    res.status(statusCode).render('error', { err });
+app.use((err,req,res,next)=>{
+    const {statusCode=500} = err;
+    if(!err.message) err.message="Something went wrong";
+    res.status(statusCode).render("error",{err});
 });
 
-/* ---------------- Server ---------------- */
+/* ---------------- SERVER ---------------- */
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, () => {
+app.listen(port,()=>{
     console.log(`Serving on port ${port}`);
 });
