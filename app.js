@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -12,8 +14,7 @@ const User = require('./models/user');
 const Listing = require('./models/listing');
 const Booking = require('./models/booking');
 const Review = require('./models/review');
-const { storeReturnTo } = require('./middleware');
-const { isLoggedIn } = require('./middleware');
+const { storeReturnTo, isLoggedIn } = require('./middleware');
 
 const userRoutes = require('./routes/users');
 const listingRoutes = require('./routes/listings');
@@ -21,16 +22,22 @@ const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviews');
 const adminRoutes = require('./routes/admin');
 
-mongoose.connect("mongodb+srv://prtejasreddy2006_db_user:N7a2IWKr8JtY2GA6@cluster0.ekdc7dm.mongodb.net/wanderlust?appName=Cluster0")
-    .then(() => {
-        console.log("MONGO CONNECTION OPEN!!!")
-    })
-    .catch(err => {
-        console.log("OH NO MONGO CONNECTION ERROR!!!!")
-        console.log(err)
-    });
-
 const app = express();
+
+/* ---------------- MongoDB Connection ---------------- */
+
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    console.log("MONGO CONNECTION OPEN!!!");
+})
+.catch(err => {
+    console.log("OH NO MONGO CONNECTION ERROR!!!!");
+    console.log(err);
+});
+
+/* ---------------- App Config ---------------- */
+
+app.set("trust proxy", 1);
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
@@ -41,10 +48,12 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+/* ---------------- Session Config ---------------- */
+
 const sessionConfig = {
-    secret: 'thisshouldbeabettersecret!',
+    secret: process.env.SESSION_SECRET || "thisshouldbeabettersecret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
@@ -55,12 +64,16 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+/* ---------------- Passport Config ---------------- */
+
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
 
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+/* ---------------- Global Variables ---------------- */
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
@@ -69,15 +82,21 @@ app.use((req, res, next) => {
     next();
 });
 
+/* ---------------- Routes ---------------- */
+
 app.use('/', userRoutes);
 app.use('/listings', listingRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/reviews', reviewRoutes);
 app.use('/admin', adminRoutes);
 
+/* ---------------- Home Route ---------------- */
+
 app.get('/', (req, res) => {
     res.render('home');
 });
+
+/* ---------------- Dashboard ---------------- */
 
 app.get('/dashboard', isLoggedIn, async (req, res) => {
     const listingsCount = await Listing.countDocuments({ owner: req.user._id });
@@ -88,6 +107,7 @@ app.get('/dashboard', isLoggedIn, async (req, res) => {
         { $match: { user: req.user._id } },
         { $group: { _id: null, totalSpent: { $sum: "$totalPrice" } } }
     ]);
+
     const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
 
     const recentBookings = await Booking.find({ user: req.user._id })
@@ -95,20 +115,33 @@ app.get('/dashboard', isLoggedIn, async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(5);
 
-    res.render('dashboard/index', { listingsCount, bookingsCount, reviewsCount, recentBookings, totalSpent });
+    res.render('dashboard/index', {
+        listingsCount,
+        bookingsCount,
+        reviewsCount,
+        recentBookings,
+        totalSpent
+    });
 });
 
-app.all('*', (req, res, next) => {
+/* ---------------- 404 Handler ---------------- */
+
+app.all('*', (req, res) => {
     res.status(404).render('error', { error: 'Page Not Found' });
 });
 
+/* ---------------- Error Handler ---------------- */
+
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
-    if (!err.message) err.message = 'Oh No, Something Went Wrong!'
+    if (!err.message) err.message = "Oh No, Something Went Wrong!";
     res.status(statusCode).render('error', { err });
 });
 
+/* ---------------- Server ---------------- */
+
 const port = process.env.PORT || 8080;
+
 app.listen(port, () => {
-    console.log(`Serving on port ${port}`)
+    console.log(`Serving on port ${port}`);
 });
